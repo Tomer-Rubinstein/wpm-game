@@ -1,11 +1,14 @@
 import React from "react";
+import "./LyricsPromptComp.css";
 import FirstLine from './FirstLine';
 
 class LyricsPromptComp extends React.Component {
     constructor(props) {
         super(props);
         this.subtitles = this.props.subtitles;
-        this.timingList = [14.28, 17.88, 21.88, 25.44, 29.56, 33.4, 37, 40.72, 50, 55.2];
+        this.timingList = this.subtitles.map((subtitle, i) => {
+            return parseFloat(subtitle['startTime']);
+        });
 
         this.state = {
             currLineIndex: -1,
@@ -46,24 +49,21 @@ class LyricsPromptComp extends React.Component {
         });
     }
 
+    // TODO: special characters (, . ? ! : ; ( ) )
+    // TODO: backspace, to fix spelling mistakes and other shortcuts
     onkeydown = (event) => {
-        if (this.state.currLineIndex < 0)
+        if (this.state.currLineIndex < 0 || this.state.currLineIndex >= this.subtitles.length)
             return;
 
         var currLineIndex = this.state.currLineIndex;
         var currCharIndex = this.state.currCharIndex;
         var successfulTypes = this.state.successfulTypes;
 
-        // TODO: special characters (, . ? ! : ; ( ) )
-        // TODO: backspace, to fix spelling mistakes and other shortcuts
-
         const currLine = this.subtitles[currLineIndex]['text'];
-
         const pressedChar = event.key.toLowerCase();
         const targetChar = currLine.charAt(currCharIndex).toLowerCase();
 
         this.state.successfulTypes.push(pressedChar === targetChar||1==1);
-
         currCharIndex++;
         
         this.setState({
@@ -100,7 +100,10 @@ class LyricsPromptComp extends React.Component {
             return <li key={i}>{text}</li>
         });
 
-        return <ul style={{color: "rgba(255, 255, 255, 0.5)", fontWeight: "bold"}}>{subtitles}</ul>
+        return <div style={{position: "relative", textAlign: "center", userSelect: "none"}}>
+            <p className="clickToPlay">{this.props.isPlaying ? "" : "Click to Play"}</p>
+            <ul className={this.props.isPlaying ? "" : "blury"} style={{color: "rgba(255, 255, 255, 0.5)", fontWeight: "bold"}}>{subtitles}</ul>
+        </div>
     }
 }
 
@@ -117,7 +120,6 @@ function Interval(fn, time) {
     this.isRunning = () => {
         return timer !== false;
     };
-    
 }
 
 export default LyricsPromptComp;

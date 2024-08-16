@@ -17,38 +17,3 @@
 .game {
     margin-top: 3%;
 }
-
-.correctChar {
-    color: white;
-}
-
-.wrongChar {
-    color: red;
-}
-
-.caret {
-    border-radius: 2px;
-    height: 1.2em;
-    width: .1em;
-    position: absolute;
-    background: wheat;
-    display: inline;
-
-    opacity: 1;
-    animation: fade 1s infinite;
-    animation-timing-function: ease;
-}
-
-@keyframes fade {
-    0%,100% { opacity: 0 }
-    50% { opacity: 1 }
-}
-
-ul {
-    list-style-type: none;
-    text-align: center;
-}
-
-li {
-    padding-top: 5px;
-}

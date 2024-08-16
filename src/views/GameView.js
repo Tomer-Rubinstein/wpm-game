@@ -7,8 +7,8 @@ import ReactPlayer from 'react-player/youtube'
 
 /*
 TODO:
-- Play song on background (will there be ads tho?)
-- show subtitles on sync
+- Play song on background [DONE]
+- show subtitles on sync [DONE]
 - the typing functionality and make it satisfying
 - lyrics parsing (decoding and such)
 - Mute button
@@ -44,11 +44,8 @@ class GameView extends React.Component {
     }
 
     render() {
-        console.log(this.state.subtitles);
         return (
             <div className="background">
-                <meta content="text/html;charset=utf-8"></meta>
-
                 <div className="header">
                     <h3 style={{fontSize: 26}}>Now Playing...
                         <p style={{
@@ -64,9 +61,11 @@ class GameView extends React.Component {
                 </div>
                 
                 <div className="game" style={{width: "50%"}}>
-                    { this.state.subtitles == null
-                    ? <LoadingComp/>
-                    : <LyricsPromptComp subtitles={this.state.subtitles} isPlaying={this.state.playing}/> }
+                        { this.state.subtitles == null
+                        ? <LoadingComp/>
+                        :   <div onClick={this.startGame}>
+                                <LyricsPromptComp subtitles={this.state.subtitles} isPlaying={this.state.playing}/>
+                            </div> }
                 </div>
 
                 <ReactPlayer
@@ -76,7 +75,6 @@ class GameView extends React.Component {
                     height="0px"
                     playing={this.state.playing}
                 />
-                <button onClick={this.startGame}>start</button>
             </div>
 
         );
