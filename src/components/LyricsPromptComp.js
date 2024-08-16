@@ -5,40 +5,39 @@ class LyricsPromptComp extends React.Component {
     constructor(props) {
         super(props);
         this.subtitles = this.props.subtitles;
+        this.timingList = [14.28, 17.88, 21.88, 25.44, 29.56, 33.4, 37, 40.72, 50, 55.2];
 
         this.state = {
-            currLineIndex: 0,
+            currLineIndex: -1,
             currCharIndex: 0,
             successfulTypes: [] // true, false, true, true, ...
         };
 
         this.linesToDisplay = 5;
-
-        this.secondsPassed = 0;
         this.startedCounting = false;
-        this.tickInterval = new Interval(this.gameTick, 500); // TODO: instead of interval, use Date. more accurate.
+        this.tickInterval = new Interval(this.gameTick, this.timingList[0]*1000);
 
         onkeydown = this.onkeydown;
+    }
+
+    setNewTime = (newTime) => {
+        this.tickInterval.stop();
+        this.tickInterval = new Interval(this.gameTick, newTime);
+        if (!this.tickInterval.isRunning() && this.props.isPlaying)
+            this.tickInterval.start();
     }
 
     gameTick = () => {
         var currLineIndex = this.state.currLineIndex;
         var currCharIndex = this.state.currCharIndex;
         var successfulTypes = this.state.successfulTypes;
-        const currLine = this.subtitles[currLineIndex]['text'];
 
-        this.secondsPassed += 0.5;
-        
-        console.log(this.secondsPassed);
+        currLineIndex++;
+        currCharIndex = 0;
+        successfulTypes = [];
 
-        if (currCharIndex >= currLine.length) {
-            if (parseFloat(this.subtitles[currLineIndex+1]['startTime']) < this.secondsPassed) {
-                currLineIndex++;
-                currCharIndex = 0;
-                successfulTypes = [];
-                console.log("can go")
-            }
-        }
+        const deltaTime = (this.timingList[currLineIndex+1] - this.timingList[currLineIndex]); // TODO: bounds check
+        this.setNewTime(deltaTime*1000);
 
         this.setState({
             currLineIndex: currLineIndex,
@@ -48,6 +47,9 @@ class LyricsPromptComp extends React.Component {
     }
 
     onkeydown = (event) => {
+        if (this.state.currLineIndex < 0)
+            return;
+
         var currLineIndex = this.state.currLineIndex;
         var currCharIndex = this.state.currCharIndex;
         var successfulTypes = this.state.successfulTypes;
@@ -75,14 +77,13 @@ class LyricsPromptComp extends React.Component {
         if (!this.tickInterval.isRunning() && this.props.isPlaying)
             this.tickInterval.start();
 
+        const lineIndexToDisplay = (this.state.currLineIndex < 0) ? 0 : this.state.currLineIndex;
         const currLines = this.subtitles.slice(
-            this.state.currLineIndex,
-            this.state.currLineIndex+this.linesToDisplay
+            lineIndexToDisplay,
+            lineIndexToDisplay+this.linesToDisplay
         );
 
-        if (currLines === undefined) {
-
-        }
+        if (currLines === undefined) { /* TODO */ }
         
         const subtitles = currLines.map((subtitle, i) => {
             const text = subtitle['text'];
@@ -105,17 +106,18 @@ class LyricsPromptComp extends React.Component {
 
 function Interval(fn, time) {
     var timer = false;
-    this.start = function () {
+    this.start = () => {
         if (!this.isRunning())
             timer = setInterval(fn, time);
     };
-    this.stop = function () {
+    this.stop = () => {
         clearInterval(timer);
         timer = false;
     };
-    this.isRunning = function () {
+    this.isRunning = () => {
         return timer !== false;
     };
+    
 }
 
 export default LyricsPromptComp;
