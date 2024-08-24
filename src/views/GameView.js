@@ -1,9 +1,8 @@
 import "./GameView.css";
-import { fetchSubtitles } from '../utils/subtitles';
+import { fetchSubtitles } from '../utils/Subtitles';
 import React from "react";
 import LoadingComp from "../components/LoadingComp";
 import LyricsPromptComp from "../components/LyricsPromptComp";
-import ReactPlayer from 'react-player/youtube'
 
 /*
 TODO:
@@ -21,7 +20,7 @@ TODO:
 class GameView extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {subtitles: null, playing: false};
+        this.state = {subtitles: null};
     }
 
     componentDidMount() {
@@ -37,10 +36,6 @@ class GameView extends React.Component {
         } catch (err) {
             console.log(err);
         }
-    }
-
-    startGame = () => {
-        this.setState({playing: true})
     }
 
     render() {
@@ -63,18 +58,13 @@ class GameView extends React.Component {
                 <div className="game" style={{width: "50%"}}>
                         { this.state.subtitles == null
                         ? <LoadingComp/>
-                        :   <div onClick={this.startGame}>
-                                <LyricsPromptComp subtitles={this.state.subtitles} isPlaying={this.state.playing}/>
+                        :   <div>
+                                <LyricsPromptComp
+                                    subtitles={this.state.subtitles}
+                                    ytSongID={this.props.ytSongID}
+                                />
                             </div> }
                 </div>
-
-                <ReactPlayer
-                    url={`https://www.youtube.com/watch?v=${this.props.ytSongID}`}
-                    volume={.1}
-                    width="0px"
-                    height="0px"
-                    playing={this.state.playing}
-                />
             </div>
 
         );

@@ -1,9 +1,12 @@
 import './App.css';
 import GameView from './views/GameView';
+import Home from './views/Home';
 
 function App() {
   
-  return <GameView songTitle="Love Me Again" ytSongID="CfihYWRWRTQ"/>
+  return <Home/>
+
+  // return <GameView songTitle="Love Me Again" ytSongID="CfihYWRWRTQ"/>
 
   // return (
   //   <div className="App">

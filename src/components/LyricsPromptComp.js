@@ -1,6 +1,8 @@
 import React from "react";
 import "./LyricsPromptComp.css";
 import FirstLine from './FirstLine';
+import ReactPlayer from 'react-player/youtube'
+import Interval from "../utils/Interval";
 
 class LyricsPromptComp extends React.Component {
     constructor(props) {
@@ -13,7 +15,8 @@ class LyricsPromptComp extends React.Component {
         this.state = {
             currLineIndex: -1,
             currCharIndex: 0,
-            successfulTypes: [] // true, false, true, true, ...
+            successfulTypes: [], // true, false, true, true, ...
+            isPlaying: false
         };
 
         this.linesToDisplay = 5;
@@ -26,7 +29,7 @@ class LyricsPromptComp extends React.Component {
     setNewTime = (newTime) => {
         this.tickInterval.stop();
         this.tickInterval = new Interval(this.gameTick, newTime);
-        if (!this.tickInterval.isRunning() && this.props.isPlaying)
+        if (!this.tickInterval.isRunning() && this.state.isPlaying)
             this.tickInterval.start();
     }
 
@@ -48,10 +51,19 @@ class LyricsPromptComp extends React.Component {
             successfulTypes: successfulTypes
         });
     }
+    
+    startGame = () => {
+        this.setState({isPlaying: true})
+    }
 
     // TODO: special characters (, . ? ! : ; ( ) )
     // TODO: backspace, to fix spelling mistakes and other shortcuts
     onkeydown = (event) => {
+        if (event.keyCode === 27 && this.state.isPlaying) {
+            this.setState({isPlaying: false});
+            console.log("stop")
+        }
+
         if (this.state.currLineIndex < 0 || this.state.currLineIndex >= this.subtitles.length)
             return;
 
@@ -74,7 +86,7 @@ class LyricsPromptComp extends React.Component {
     }
 
     render() {
-        if (!this.tickInterval.isRunning() && this.props.isPlaying)
+        if (!this.tickInterval.isRunning() && this.state.isPlaying)
             this.tickInterval.start();
 
         const lineIndexToDisplay = (this.state.currLineIndex < 0) ? 0 : this.state.currLineIndex;
@@ -100,26 +112,18 @@ class LyricsPromptComp extends React.Component {
             return <li key={i}>{text}</li>
         });
 
-        return <div style={{position: "relative", textAlign: "center", userSelect: "none"}}>
-            <p className="clickToPlay">{this.props.isPlaying ? "" : "Click to Play"}</p>
-            <ul className={this.props.isPlaying ? "" : "blury"} style={{color: "rgba(255, 255, 255, 0.5)", fontWeight: "bold"}}>{subtitles}</ul>
+        return <div className="promptParentDiv" onClick={this.startGame}>
+            <p className="clickToPlay">{this.state.isPlaying ? "" : "Click to Play"}</p>
+            <ul className={this.state.isPlaying ? "" : "blury"}>{subtitles}</ul>
+            <ReactPlayer
+                url={`https://www.youtube.com/watch?v=${this.props.ytSongID}`}
+                volume={.1}
+                width="0px"
+                height="0px"
+                playing={this.state.isPlaying}
+            />
         </div>
     }
-}
-
-function Interval(fn, time) {
-    var timer = false;
-    this.start = () => {
-        if (!this.isRunning())
-            timer = setInterval(fn, time);
-    };
-    this.stop = () => {
-        clearInterval(timer);
-        timer = false;
-    };
-    this.isRunning = () => {
-        return timer !== false;
-    };
 }
 
 export default LyricsPromptComp;

@@ -1,4 +1,10 @@
 
+.promptParentDiv {
+    position: relative;
+    text-align: center;
+    user-select: none;
+}
+
 .clickToPlay {
     position: absolute;
     text-align: center;
@@ -43,6 +49,8 @@ ul {
     list-style-type: none;
     padding: 0;
     text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: bold;
 }
 
 li {
