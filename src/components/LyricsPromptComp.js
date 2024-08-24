@@ -60,7 +60,6 @@ class LyricsPromptComp extends React.Component {
     }
 
     // TODO: special characters (, . ? ! : ; ( ) )
-    // TODO: backspace, to fix spelling mistakes and other shortcuts
     onkeydown = (event) => {
         if (this.state.currLineIndex < 0 || this.state.currLineIndex >= this.subtitles.length)
             return;
@@ -69,20 +68,8 @@ class LyricsPromptComp extends React.Component {
         var currCharIndex = this.state.currCharIndex;
         var successfulTypes = this.state.successfulTypes;
 
-        // escape - pause game
-        if (event.keyCode === 27 && this.state.isPlaying) {
-            this.setState({isPlaying: false});
-            console.log("[TODO] pause");
+        if (this.state.isPlaying && this.handleSpecialKeys(event.keyCode))
             return;
-        }
-
-        // backspace - delete last typed char
-        if (event.keyCode == 8 && this.state.isPlaying) {
-            successfulTypes.pop();
-            currCharIndex = (currCharIndex-1 < 0) ? 0 : currCharIndex-1;
-            this.setState({currCharIndex: currCharIndex, successfulTypes: successfulTypes});
-            return;
-        }
 
         const currLine = this.subtitles[currLineIndex]['text'];
         const pressedChar = event.key.toLowerCase();
@@ -96,6 +83,53 @@ class LyricsPromptComp extends React.Component {
             currLineIndex: currLineIndex,
             successfulTypes: successfulTypes
         });
+    }
+
+    handleSpecialKeys = (keyCode) => {
+        var currLineIndex = this.state.currLineIndex;
+        var currCharIndex = this.state.currCharIndex;
+        var successfulTypes = this.state.successfulTypes;
+        var isPlaying = this.state.isPlaying;
+        const currLine = this.subtitles[currLineIndex]['text'];
+
+        switch (keyCode) {
+            // escape - pause game
+            case 27:
+                isPlaying = false;
+                console.log("[TODO] pause");
+                break;
+
+            // backspace - delete last typed char
+            case 8:
+                successfulTypes.pop();
+                currCharIndex = (currCharIndex-1 < 0) ? 0 : currCharIndex-1;
+                break;
+
+            // space bar - can skip word if first letter attempt was made
+            case 32:
+                if (currCharIndex-1 >= 0 && currLine.charAt(currCharIndex-1) !== ' ') {
+                    while(currCharIndex < currLine.length) {
+                        successfulTypes.push(false);
+                        currCharIndex++;
+
+                        if (currLine.charAt(currCharIndex-1) === ' ') {
+                            break;
+                        }
+                    }
+                }
+                break;
+
+            default: return false;
+        }
+
+
+        this.setState({
+            currCharIndex: currCharIndex,
+            currLineIndex: currLineIndex,
+            successfulTypes: successfulTypes,
+            isPlaying: isPlaying
+        });
+        return true;
     }
 
     render() {
