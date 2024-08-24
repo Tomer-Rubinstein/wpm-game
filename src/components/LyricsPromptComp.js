@@ -62,11 +62,6 @@ class LyricsPromptComp extends React.Component {
     // TODO: special characters (, . ? ! : ; ( ) )
     // TODO: backspace, to fix spelling mistakes and other shortcuts
     onkeydown = (event) => {
-        if (event.keyCode === 27 && this.state.isPlaying) {
-            this.setState({isPlaying: false});
-            console.log("stop")
-        }
-
         if (this.state.currLineIndex < 0 || this.state.currLineIndex >= this.subtitles.length)
             return;
 
@@ -74,11 +69,26 @@ class LyricsPromptComp extends React.Component {
         var currCharIndex = this.state.currCharIndex;
         var successfulTypes = this.state.successfulTypes;
 
+        // escape - pause game
+        if (event.keyCode === 27 && this.state.isPlaying) {
+            this.setState({isPlaying: false});
+            console.log("[TODO] pause");
+            return;
+        }
+
+        // backspace - delete last typed char
+        if (event.keyCode == 8 && this.state.isPlaying) {
+            successfulTypes.pop();
+            currCharIndex = (currCharIndex-1 < 0) ? 0 : currCharIndex-1;
+            this.setState({currCharIndex: currCharIndex, successfulTypes: successfulTypes});
+            return;
+        }
+
         const currLine = this.subtitles[currLineIndex]['text'];
         const pressedChar = event.key.toLowerCase();
         const targetChar = currLine.charAt(currCharIndex).toLowerCase();
 
-        this.state.successfulTypes.push(pressedChar === targetChar||1==1);
+        successfulTypes.push(pressedChar === targetChar);
         currCharIndex++;
         
         this.setState({
