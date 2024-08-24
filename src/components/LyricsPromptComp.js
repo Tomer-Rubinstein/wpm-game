@@ -7,7 +7,10 @@ import Interval from "../utils/Interval";
 class LyricsPromptComp extends React.Component {
     constructor(props) {
         super(props);
+
         this.subtitles = this.props.subtitles;
+        this.ytSongID = this.props.ytSongID;
+
         this.timingList = this.subtitles.map((subtitle, i) => {
             return parseFloat(subtitle['startTime']);
         });
@@ -116,7 +119,7 @@ class LyricsPromptComp extends React.Component {
             <p className="clickToPlay">{this.state.isPlaying ? "" : "Click to Play"}</p>
             <ul className={this.state.isPlaying ? "" : "blury"}>{subtitles}</ul>
             <ReactPlayer
-                url={`https://www.youtube.com/watch?v=${this.props.ytSongID}`}
+                url={`https://www.youtube.com/watch?v=${this.ytSongID}`}
                 volume={.1}
                 width="0px"
                 height="0px"

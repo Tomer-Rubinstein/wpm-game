@@ -1,10 +1,7 @@
 import "./RecommendationCard.css";
 import ReactPlayer from 'react-player/youtube'
 import Marquee from "react-fast-marquee";
-
-function redirectToGame(songUrl) {
-    alert("redirect to game screen");
-}
+import { Link } from "react-router-dom";
 
 export default function RecommendationCard(props) {
     const songUrl = props.songUrl;
@@ -12,7 +9,7 @@ export default function RecommendationCard(props) {
 
     return (
         <div className="cardBackground">
-            <div onClick={redirectToGame}>
+            <Link to={`/game?songTitle=${songTitle}&ytSongID=${songUrl}`}>
                 <ReactPlayer
                     url={songUrl}
                     light={true}
@@ -21,7 +18,7 @@ export default function RecommendationCard(props) {
                     width="300px"
                     height="200px"
                 />
-            </div>
+            </Link>
 
             <div>
                 <Marquee autoFill={true} speed={30}>
