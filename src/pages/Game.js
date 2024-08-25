@@ -5,6 +5,7 @@ import LoadingComp from "../components/LoadingComp";
 import LyricsPromptComp from "../components/LyricsPromptComp";
 import { useLocation } from "react-router-dom";
 
+
 /*
 TODO:
 - Play song on background [DONE]

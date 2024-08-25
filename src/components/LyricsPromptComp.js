@@ -112,16 +112,14 @@ class LyricsPromptComp extends React.Component {
                         successfulTypes.push(false);
                         currCharIndex++;
 
-                        if (currLine.charAt(currCharIndex-1) === ' ') {
+                        if (currLine.charAt(currCharIndex-1) === ' ')
                             break;
-                        }
                     }
                 }
                 break;
 
             default: return false;
         }
-
 
         this.setState({
             currCharIndex: currCharIndex,

@@ -1,3 +1,4 @@
+import parseSubtitle from "./SubtitleParser";
 
 async function getSubtitlesUrl(ytVideoID) {
     const apiKey = process.env.REACT_APP_YT_API_KEY;
@@ -46,15 +47,6 @@ async function getSubtitlesUrl(ytVideoID) {
     return subtitlesUrl;
 }
 
-function parseHtmlEnteties(str) {
-    str = str.replace(/&#([0-9]{1,3});/gi, function(match, numStr) {
-        var num = parseInt(numStr, 10);
-        return String.fromCharCode(num);
-    });
-    str = str.replace("\n", "");
-    return str;
-}
-
 async function fetchSubtitles(ytVideoID) {
     const subtitlesUrl = await getSubtitlesUrl(ytVideoID);
 
@@ -70,7 +62,9 @@ async function fetchSubtitles(ytVideoID) {
     for (let textTag of subtitlesXML.getElementsByTagName("text")) {
         const startTime = textTag.getAttribute("start");
         const duration = textTag.getAttribute("dur");
-        const text = (textTag.childNodes.length > 0) ? parseHtmlEnteties(textTag.childNodes[0].nodeValue) : null;
+        const text = (textTag.childNodes.length > 0) ? parseSubtitle(textTag.childNodes[0].nodeValue) : "";
+        if (text.length === 0)
+            continue;
 
         if (!startTime || !duration || !text)
             continue;
