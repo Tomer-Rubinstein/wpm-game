@@ -1,5 +1,5 @@
 import "./Game.css";
-import { fetchSubtitles } from '../utils/Subtitles';
+import fetchSubtitles from '../utils/Subtitles';
 import React from "react";
 import LoadingComp from "../components/LoadingComp";
 import LyricsPromptComp from "../components/LyricsPromptComp";

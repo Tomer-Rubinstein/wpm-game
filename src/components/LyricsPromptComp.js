@@ -11,9 +11,12 @@ class LyricsPromptComp extends React.Component {
         this.subtitles = this.props.subtitles;
         this.ytSongID = this.props.ytSongID;
 
-        this.timingList = this.subtitles.map((subtitle, i) => {
-            return parseFloat(subtitle['startTime']);
-        });
+        const startTimeDelta = 5;
+        [this.timingList, this.fixedStartTime] = this.initTimingList(this.subtitles, startTimeDelta);
+
+        this.linesToDisplay = 5;
+        this.startedCounting = false;
+        this.tickInterval = new Interval(this.gameTick, this.timingList[0]*1000);
 
         this.state = {
             currLineIndex: -1,
@@ -22,11 +25,24 @@ class LyricsPromptComp extends React.Component {
             isPlaying: false
         };
 
-        this.linesToDisplay = 5;
-        this.startedCounting = false;
-        this.tickInterval = new Interval(this.gameTick, this.timingList[0]*1000);
-
         onkeydown = this.onkeydown;
+    }
+
+    /* initialize the lyrics timing such that the first lyric line
+    * will activate after @startTimeDelta seconds after user started game.
+    * returns the fixated timingList and the constant that was used for the fix 
+    * the fix constant will be used to start the ReactPlayer accordingly */
+    initTimingList = (subtitles, startTimeDelta) => {
+        var fix = 0;
+        const timingList = subtitles.map((subtitle, i) => {
+            var startTime = subtitle['startTime'];
+            if (i === 0)
+                fix = Math.max(0, startTime-startTimeDelta);
+
+            return startTime-fix;
+        });
+
+        return [timingList, fix];
     }
 
     setNewTime = (newTime) => {
@@ -140,7 +156,7 @@ class LyricsPromptComp extends React.Component {
             lineIndexToDisplay+this.linesToDisplay
         );
 
-        if (currLines === undefined) { /* TODO */ }
+        if (currLines === undefined) { /* TODO: win condition */ }
         
         const subtitles = currLines.map((subtitle, i) => {
             const text = subtitle['text'];
@@ -160,15 +176,33 @@ class LyricsPromptComp extends React.Component {
         return <div className="promptParentDiv" onClick={this.startGame}>
             <p className="clickToPlay">{this.state.isPlaying ? "" : "Click to Play"}</p>
             <ul className={this.state.isPlaying ? "" : "blury"}>{subtitles}</ul>
-            <ReactPlayer
-                url={`https://www.youtube.com/watch?v=${this.ytSongID}`}
-                volume={.1}
-                width="0px"
-                height="0px"
-                playing={this.state.isPlaying}
+            <InvisibleReactPlayer
+                timeToStart={this.fixedStartTime}
+                isPlaying={this.state.isPlaying}
+                ytSongID={this.ytSongID}
             />
         </div>
     }
+}
+
+function InvisibleReactPlayer({timeToStart, isPlaying, ytSongID}) {
+    const playerRef = React.useRef();
+    
+    const onReady = React.useCallback(() => {
+        playerRef.current.seekTo(timeToStart, "seconds");
+    }, [timeToStart]);
+
+    return (
+        <ReactPlayer
+            url={`https://www.youtube.com/watch?v=${ytSongID}`}
+            volume={.1}
+            width="0px"
+            height="0px"
+            playing={isPlaying}
+            ref={playerRef}
+            onReady={onReady}
+        />
+    );
 }
 
 export default LyricsPromptComp;

@@ -1,5 +1,6 @@
 import parseSubtitle from "./SubtitleParser";
 
+
 async function getSubtitlesUrl(ytVideoID) {
     const apiKey = process.env.REACT_APP_YT_API_KEY;
     const apiUrl = `/player?key=${apiKey}&prettyPrint=false`; // assumes package.json proxy points to "youtubei/v1" API
@@ -47,38 +48,34 @@ async function getSubtitlesUrl(ytVideoID) {
     return subtitlesUrl;
 }
 
+
 async function fetchSubtitles(ytVideoID) {
     const subtitlesUrl = await getSubtitlesUrl(ytVideoID);
-
     const resp = await fetch(subtitlesUrl, {
         method: "GET"
     });
-    const subtitlesRawXML = await resp.text();
 
+    const subtitlesRawXML = await resp.text();
     const parser = new DOMParser();
     const subtitlesXML = parser.parseFromString(subtitlesRawXML, "text/xml");
+
     let subtitles = [];
-
     for (let textTag of subtitlesXML.getElementsByTagName("text")) {
-        const startTime = textTag.getAttribute("start");
-        const duration = textTag.getAttribute("dur");
+        const startTime = parseFloat(textTag.getAttribute("start"));
         const text = (textTag.childNodes.length > 0) ? parseSubtitle(textTag.childNodes[0].nodeValue) : "";
-        if (text.length === 0)
-            continue;
 
-        if (!startTime || !duration || !text)
+        if (!startTime || !text || text.length === 0)
             continue;
 
         const subtitleObj = {
             "startTime": startTime,
-            "duration": duration,
             "text": text
         };
-
         subtitles.push(subtitleObj);
     }
 
+    console.log(subtitles);
     return subtitles;
 }
 
-export { fetchSubtitles };
+export default fetchSubtitles;
