@@ -1,8 +1,9 @@
 import React from "react";
 import "./LyricsPromptComp.css";
 import FirstLine from './FirstLine';
-import ReactPlayer from 'react-player/youtube'
 import Interval from "../utils/Interval";
+import InvisibleReactPlayer from "./InvisibleReactPlayer";
+import Indicator from "./Indicator";
 
 class LyricsPromptComp extends React.Component {
     constructor(props) {
@@ -183,7 +184,6 @@ class LyricsPromptComp extends React.Component {
             const text = subtitle['text'];
             var element = <li>{text}</li>;
             
-            console.log(this.state.syncLineIndex-this.state.currLineIndex);
             if (i === 0)
                 element = <li>
                     <FirstLine
@@ -212,41 +212,6 @@ class LyricsPromptComp extends React.Component {
             />
         </div>
     }
-}
-
-function InvisibleReactPlayer({timeToStart, isPlaying, ytSongID}) {
-    const playerRef = React.useRef();
-    
-    const onReady = React.useCallback(() => {
-        playerRef.current.seekTo(timeToStart, "seconds");
-    }, [timeToStart]);
-
-    return (
-        <ReactPlayer
-            url={`https://www.youtube.com/watch?v=${ytSongID}`}
-            volume={.05}
-            width="0px"
-            height="0px"
-            playing={isPlaying}
-            ref={playerRef}
-            onReady={onReady}
-        />
-    );
-}
-
-function Indicator({syncLineIndex, currLineIndex}) {
-    const difference = syncLineIndex-currLineIndex;
-    if (difference < 0 || difference > 2)
-        return <></>
-    
-    const diffColors = ["#77dd77", "#ffbf00", "#cf352e"];
-    return (
-        <p className={(difference === 2) ? "warningIndicator" : ""} style={{
-            display: "inline",
-            fontWeight: "bold",
-            color: diffColors[difference],
-        }}>&rarr; </p>
-    );
 }
 
 export default LyricsPromptComp;
