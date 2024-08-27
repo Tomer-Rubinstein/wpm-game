@@ -20,9 +20,10 @@ class LyricsPromptComp extends React.Component {
 
         this.state = {
             currLineIndex: -1,
+            syncLineIndex: -1,
             currCharIndex: 0,
             successfulTypes: [], // true, false, true, true, ...
-            isPlaying: false
+            isPlaying: false,
         };
 
         onkeydown = this.onkeydown;
@@ -56,15 +57,24 @@ class LyricsPromptComp extends React.Component {
         var currLineIndex = this.state.currLineIndex;
         var currCharIndex = this.state.currCharIndex;
         var successfulTypes = this.state.successfulTypes;
+        var syncLineIndex = this.state.syncLineIndex;
 
-        currLineIndex++;
-        currCharIndex = 0;
-        successfulTypes = [];
+        syncLineIndex++;
+        if (currLineIndex < 0)
+            currLineIndex++;
 
-        const deltaTime = (this.timingList[currLineIndex+1] - this.timingList[currLineIndex]); // TODO: bounds check
+        const currLine = this.subtitles[currLineIndex]['text'];
+        if (currCharIndex >= currLine.length && this.state.syncLineIndex === this.state.currLineIndex) {
+            currLineIndex++;
+            currCharIndex = 0;
+            successfulTypes = [];
+        }
+
+        const deltaTime = (this.timingList[syncLineIndex+1] - this.timingList[syncLineIndex]); // TODO: bounds check
         this.setNewTime(deltaTime*1000);
 
         this.setState({
+            syncLineIndex: syncLineIndex,
             currLineIndex: currLineIndex,
             currCharIndex: currCharIndex,
             successfulTypes: successfulTypes
@@ -106,6 +116,7 @@ class LyricsPromptComp extends React.Component {
         var currCharIndex = this.state.currCharIndex;
         var successfulTypes = this.state.successfulTypes;
         var isPlaying = this.state.isPlaying;
+        var syncLineIndex = this.state.syncLineIndex;
         const currLine = this.subtitles[currLineIndex]['text'];
 
         switch (keyCode) {
@@ -134,6 +145,15 @@ class LyricsPromptComp extends React.Component {
                 }
                 break;
 
+            // enter - go to next lyric line
+            case 13:
+                if (currCharIndex >= currLine.length && this.state.syncLineIndex > this.state.currLineIndex) {
+                    currLineIndex++;
+                    currCharIndex = 0;
+                    successfulTypes = [];
+                }
+                break;
+
             default: return false;
         }
 
@@ -141,7 +161,8 @@ class LyricsPromptComp extends React.Component {
             currCharIndex: currCharIndex,
             currLineIndex: currLineIndex,
             successfulTypes: successfulTypes,
-            isPlaying: isPlaying
+            isPlaying: isPlaying,
+            syncLineIndex: syncLineIndex
         });
         return true;
     }
@@ -160,9 +181,11 @@ class LyricsPromptComp extends React.Component {
         
         const subtitles = currLines.map((subtitle, i) => {
             const text = subtitle['text'];
+            var element = <li>{text}</li>;
             
+            console.log(this.state.syncLineIndex-this.state.currLineIndex);
             if (i === 0)
-                return <li key={i}>
+                element = <li>
                     <FirstLine
                         text={text}
                         successfulTypes={this.state.successfulTypes}
@@ -170,7 +193,13 @@ class LyricsPromptComp extends React.Component {
                     />
                 </li>
 
-            return <li key={i}>{text}</li>
+            if (i === this.state.syncLineIndex-this.state.currLineIndex)
+                return <div key={i} style={{display: "inline-block"}}>
+                    <Indicator syncLineIndex={this.state.syncLineIndex} currLineIndex={this.state.currLineIndex}/>
+                    <div style={{display: "inline-block"}}>{element}</div>
+                </div>
+            else
+                return <div key={i}>{element}</div>;
         });
 
         return <div className="promptParentDiv" onClick={this.startGame}>
@@ -195,13 +224,28 @@ function InvisibleReactPlayer({timeToStart, isPlaying, ytSongID}) {
     return (
         <ReactPlayer
             url={`https://www.youtube.com/watch?v=${ytSongID}`}
-            volume={.1}
+            volume={.05}
             width="0px"
             height="0px"
             playing={isPlaying}
             ref={playerRef}
             onReady={onReady}
         />
+    );
+}
+
+function Indicator({syncLineIndex, currLineIndex}) {
+    const difference = syncLineIndex-currLineIndex;
+    if (difference < 0 || difference > 2)
+        return <></>
+    
+    const diffColors = ["#77dd77", "#ffbf00", "#cf352e"];
+    return (
+        <p className={(difference === 2) ? "warningIndicator" : ""} style={{
+            display: "inline",
+            fontWeight: "bold",
+            color: diffColors[difference],
+        }}>&rarr; </p>
     );
 }
 
