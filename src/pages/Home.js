@@ -35,9 +35,8 @@ export default function Home () {
     const playGameByUrl = (event) => {
         if (event.key === "Enter") {
             const youtubeUrl = event.target.value;
-            const youtubeTitle = "lol";
             event.preventDefault();
-            navigate(`/game?songTitle=${youtubeTitle}&ytSongID=${youtubeUrl}`);
+            navigate(`/game?ytSongID=${youtubeUrl}`);
         }
     }
 

@@ -9,7 +9,7 @@ export default function RecommendationCard(props) {
 
     return (
         <div className="cardBackground">
-            <Link to={`/game?songTitle=${songTitle}&ytSongID=${songUrl}`}>
+            <Link to={`/game?ytSongID=${songUrl}`}>
                 <ReactPlayer
                     url={songUrl}
                     light={true}

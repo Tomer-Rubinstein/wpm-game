@@ -33,24 +33,35 @@ async function getSubtitlesUrl(ytVideoID) {
     })
 
     const jsonResp = JSON.parse(await resp.text());
-    const tracks = jsonResp['captions']['playerCaptionsTracklistRenderer']['captionTracks'];
+    let subtitlesUrl = null;
+    let videoTitle = null;
+    try {
+        const tracks = jsonResp['captions']['playerCaptionsTracklistRenderer']['captionTracks'];
 
-    let englishTrack = null;
-    tracks.forEach(track => {
-        if (track['languageCode'] === 'en')
-            englishTrack = track;
-    });
+        /* get subtitles url */
+        let englishTrack = null;
+        tracks.forEach(track => {
+            if (track['languageCode'] === 'en')
+                englishTrack = track;
+        });
+        subtitlesUrl = englishTrack['baseUrl'];
 
-    if (englishTrack == null)
-        return null;
+        /* get youtube video title */
+        videoTitle = jsonResp['videoDetails']['title'];
+    } catch (err) {
+        console.log(err);
+        return [null, null];
+    }
 
-    const subtitlesUrl = englishTrack['baseUrl'];
-    return subtitlesUrl;
+    return [videoTitle, subtitlesUrl];
 }
 
 
-async function fetchSubtitles(ytVideoID) {
-    const subtitlesUrl = await getSubtitlesUrl(ytVideoID);
+export default async function fetchSubtitles(ytVideoID) {
+    const [videoTitle, subtitlesUrl] = await getSubtitlesUrl(ytVideoID);
+    if (videoTitle == null || subtitlesUrl == null)
+        return [null, null];
+
     const resp = await fetch(subtitlesUrl, {
         method: "GET"
     });
@@ -74,8 +85,5 @@ async function fetchSubtitles(ytVideoID) {
         subtitles.push(subtitleObj);
     }
 
-    console.log(subtitles);
-    return subtitles;
+    return [videoTitle, subtitles];
 }
-
-export default fetchSubtitles;
