@@ -104,7 +104,13 @@ class LyricsPromptComp extends React.Component {
 
         successfulTypes.push(pressedChar === targetChar);
         currCharIndex++;
-        
+
+        if (currCharIndex >= currLine.length && this.state.syncLineIndex > this.state.currLineIndex) {
+            currLineIndex++;
+            currCharIndex = 0;
+            successfulTypes = [];
+        }
+
         this.setState({
             currCharIndex: currCharIndex,
             currLineIndex: currLineIndex,
@@ -143,15 +149,6 @@ class LyricsPromptComp extends React.Component {
                         if (currLine.charAt(currCharIndex-1) === ' ')
                             break;
                     }
-                }
-                break;
-
-            // enter - go to next lyric line
-            case 13:
-                if (currCharIndex >= currLine.length && this.state.syncLineIndex > this.state.currLineIndex) {
-                    currLineIndex++;
-                    currCharIndex = 0;
-                    successfulTypes = [];
                 }
                 break;
 

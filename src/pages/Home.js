@@ -4,8 +4,11 @@ import { TextField } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import RecommendationCard from '../components/RecommendationCard';
 import Grid from '@mui/material/Grid';
+import { useNavigate } from "react-router-dom";
 
 export default function Home () {
+    const navigate = useNavigate();
+
     const theme = createTheme({
         palette: {
             primary: {
@@ -29,10 +32,19 @@ export default function Home () {
             },
     ];
 
+    const playGameByUrl = (event) => {
+        if (event.key === "Enter") {
+            const youtubeUrl = event.target.value;
+            const youtubeTitle = "lol";
+            event.preventDefault();
+            navigate(`/game?songTitle=${youtubeTitle}&ytSongID=${youtubeUrl}`);
+        }
+    }
+
     return (
         <div className="background">
             <div>
-                <h1 style={{color: "wheat"}}>SongType</h1>
+                <h1 style={{color: "wheat"}}>KaraokeTyper</h1>
                 <p>Choose a song from YouTube and type it's lyrics in sync. Try your best! 😝</p>
             </div>
             <div style={{width: "50%", paddingTop: "5%"}}>
@@ -50,6 +62,7 @@ export default function Home () {
                             input: {color: "wheat"},
                         }}
                         inputProps={{min: 0, style: { textAlign: 'center' }}}
+                        onKeyDown={playGameByUrl}
                     />
                 </ThemeProvider>
             </div>
@@ -66,6 +79,5 @@ export default function Home () {
                 </Grid>
             </div>
         </div>
-    )
-    
+    );
 }

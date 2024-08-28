@@ -8,14 +8,11 @@ import { useLocation } from "react-router-dom";
 
 /*
 TODO:
-- Play song on background [DONE]
-- show subtitles on sync [DONE]
-- the typing functionality and make it satisfying
-- lyrics parsing (decoding and such)
-- Mute button
-- Pause button and escape shortcut
-- restart button and shortcut
+- keyboard shortcuts
+- volume controls
+- restart button
 - radio button: "Case sensitive YES/NO"
+- youtube url goes here... text field (and get video title from url??)
 */
 
 
@@ -54,8 +51,6 @@ class Game extends React.Component {
     }
 
     render() {
-
-
         return (
             <div className="background">
                 <div className="header">
@@ -76,7 +71,6 @@ class Game extends React.Component {
                     <ShowSubtitles state={this.state} ytSongID={this.ytSongID}/>
                 </div>
             </div>
-
         );
     }
 }
