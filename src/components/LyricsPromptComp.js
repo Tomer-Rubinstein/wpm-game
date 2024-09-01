@@ -4,13 +4,16 @@ import FirstLine from './FirstLine';
 import Interval from "../utils/Interval";
 import InvisibleReactPlayer from "./InvisibleReactPlayer";
 import Indicator from "./Indicator";
+import GameSummary from "./GameSummary";
 
 class LyricsPromptComp extends React.Component {
     constructor(props) {
         super(props);
 
+        this.noOfCorrectWords = 0;
         this.subtitles = this.props.subtitles;
         this.ytSongID = this.props.ytSongID;
+        this.onGameOver = this.props.onGameOver;
 
         const startTimeDelta = 5;
         [this.timingList, this.fixedStartTime] = this.initTimingList(this.subtitles, startTimeDelta);
@@ -166,7 +169,7 @@ class LyricsPromptComp extends React.Component {
     }
 
     render() {
-        if (!this.tickInterval.isRunning() && this.state.isPlaying)
+        if (this.state.isPlaying && !this.tickInterval.isRunning())
             this.tickInterval.start();
 
         const lineIndexToDisplay = (this.state.currLineIndex < 0) ? 0 : this.state.currLineIndex;
@@ -175,12 +178,21 @@ class LyricsPromptComp extends React.Component {
             lineIndexToDisplay+this.linesToDisplay
         );
 
-        if (currLines === undefined) { /* TODO: win condition */ }
-        
+        // check win condition
+        if (currLines.length === 0) {
+            return <GameSummary/> // TODO
+        }
+
+        // check lose condition
+        const NO_OF_LINES_FOR_LOSE = 1; // debug, TODO: in production set to 3.
+        if (this.state.syncLineIndex-this.state.currLineIndex >= NO_OF_LINES_FOR_LOSE) {
+            return <GameSummary isWin={false} noOfWords={5} noOfCorrectWords={5}/>
+        }
+
         const subtitles = currLines.map((subtitle, i) => {
             const text = subtitle['text'];
             var element = <li>{text}</li>;
-            
+
             if (i === 0)
                 element = <li>
                     <FirstLine
@@ -189,25 +201,29 @@ class LyricsPromptComp extends React.Component {
                         currCharIndex={this.state.currCharIndex}
                     />
                 </li>
-
+    
             if (i === this.state.syncLineIndex-this.state.currLineIndex)
-                return <div key={i} style={{display: "inline-block"}}>
-                    <Indicator syncLineIndex={this.state.syncLineIndex} currLineIndex={this.state.currLineIndex}/>
-                    <div style={{display: "inline-block"}}>{element}</div>
-                </div>
-            else
-                return <div key={i}>{element}</div>;
+                return (
+                    <div key={i} style={{display: "inline-block"}}>
+                        <Indicator syncLineIndex={this.state.syncLineIndex} currLineIndex={this.state.currLineIndex}/>
+                        <div style={{display: "inline-block"}}>{element}</div>
+                    </div>
+                );
+    
+            return <div key={i}>{element}</div>;
         });
 
-        return <div className="promptParentDiv" onClick={this.startGame}>
-            <p className="clickToPlay">{this.state.isPlaying ? "" : "Click to Play"}</p>
-            <ul className={this.state.isPlaying ? "" : "blury"}>{subtitles}</ul>
-            <InvisibleReactPlayer
-                timeToStart={this.fixedStartTime}
-                isPlaying={this.state.isPlaying}
-                ytSongID={this.ytSongID}
-            />
-        </div>
+        return (
+            <div className="promptParentDiv" onClick={this.startGame}>
+                <p className="clickToPlay">{this.state.isPlaying ? "" : "Click to Play"}</p>
+                <ul className={this.state.isPlaying ? "" : "blury"}>{subtitles}</ul>
+                <InvisibleReactPlayer
+                    timeToStart={this.fixedStartTime}
+                    isPlaying={this.state.isPlaying}
+                    ytSongID={this.ytSongID}
+                />
+            </div>
+        );
     }
 }
 
