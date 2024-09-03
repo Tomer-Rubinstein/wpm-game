@@ -4,6 +4,7 @@ import React from "react";
 import LoadingComp from "../components/LoadingComp";
 import LyricsPromptComp from "../components/LyricsPromptComp";
 import { useLocation } from "react-router-dom";
+import { store } from "../utils/GameStore";
 
 
 /*
@@ -11,8 +12,6 @@ TODO:
 - keyboard shortcuts
 - volume controls
 - restart button
-- radio button: "Case sensitive YES/NO"
-- youtube url goes here... text field (and get video title from url??)
 */
 
 
@@ -22,7 +21,8 @@ class Game extends React.Component {
         this.state = {
             subtitles: null,
             videoTitle: null,
-            errorMsg: null
+            errorMsg: null,
+            isWin: null,
         };
 
         this.ytSongID = props.ytSongID;
@@ -34,7 +34,14 @@ class Game extends React.Component {
     }
 
     componentDidMount() {
+        this.unsubscribe = store.subscribe(this.handleStoreChange);
         this.getSubtitles();
+    }
+
+    handleStoreChange = () => {
+        const isWin = store.getState().gameState.isWin;
+        this.setState({ isWin: isWin });
+        this.unsubscribe();
     }
 
     getSubtitles = async () => {
@@ -49,6 +56,9 @@ class Game extends React.Component {
     }
 
     render() {
+        if (this.state.isWin != null)
+            return <h1>TODO end game screen</h1>
+
         return (
             <div className="background">
                 <div className="header">
@@ -66,7 +76,10 @@ class Game extends React.Component {
                 </div>
                 
                 <div className="game" style={{width: "50%"}}>
-                    <ShowSubtitles state={this.state} ytSongID={this.ytSongID}/>
+                    <ShowSubtitles
+                        state={this.state}
+                        ytSongID={this.ytSongID}
+                    />
                 </div>
             </div>
         );

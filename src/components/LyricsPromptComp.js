@@ -1,26 +1,29 @@
 import React from "react";
 import "./LyricsPromptComp.css";
 import FirstLine from './FirstLine';
-import Interval from "../utils/Interval";
+import { DynamicInterval } from "../utils/Interval";
 import InvisibleReactPlayer from "./InvisibleReactPlayer";
 import Indicator from "./Indicator";
-import GameSummary from "./GameSummary";
+import { setIsWin } from "../utils/GameStateSlice";
+import { connect } from "react-redux";
 
 class LyricsPromptComp extends React.Component {
     constructor(props) {
         super(props);
 
+        // this.gameStateSlice = useSelector(state => state.gameStateSlice);
+        // this.gameStateDispatch = useDispatch();
+
         this.noOfCorrectWords = 0;
         this.subtitles = this.props.subtitles;
         this.ytSongID = this.props.ytSongID;
-        this.onGameOver = this.props.onGameOver;
 
-        const startTimeDelta = 5;
+        const startTimeDelta = 1; // debug, TODO: in production set to 5 
         [this.timingList, this.fixedStartTime] = this.initTimingList(this.subtitles, startTimeDelta);
 
         this.linesToDisplay = 5;
         this.startedCounting = false;
-        this.tickInterval = new Interval(this.gameTick, this.timingList[0]*1000);
+        this.tickInterval = new DynamicInterval(this.gameTick, this.timingList[0]*1000);
 
         this.state = {
             currLineIndex: -1,
@@ -50,18 +53,15 @@ class LyricsPromptComp extends React.Component {
         return [timingList, fix];
     }
 
-    setNewTime = (newTime) => {
-        this.tickInterval.stop();
-        this.tickInterval = new Interval(this.gameTick, newTime);
-        if (!this.tickInterval.isRunning() && this.state.isPlaying)
-            this.tickInterval.start();
-    }
-
     gameTick = () => {
+        if (!this.state.isPlaying)
+            return;
+
         var currLineIndex = this.state.currLineIndex;
         var currCharIndex = this.state.currCharIndex;
         var successfulTypes = this.state.successfulTypes;
         var syncLineIndex = this.state.syncLineIndex;
+        const { dispatch } = this.props;
 
         syncLineIndex++;
         if (currLineIndex < 0)
@@ -74,8 +74,19 @@ class LyricsPromptComp extends React.Component {
             successfulTypes = [];
         }
 
+        // check win condition
+        if (currLineIndex >= this.subtitles.length) {
+            dispatch(setIsWin(true));
+        }
+
+        // check lose condition
+        const NO_OF_LINES_FOR_LOSE = 1; // debug, TODO: in production set to 3.
+        if (syncLineIndex-currLineIndex >= NO_OF_LINES_FOR_LOSE) {
+            dispatch(setIsWin(false));
+        }
+
         const deltaTime = (this.timingList[syncLineIndex+1] - this.timingList[syncLineIndex]); // TODO: bounds check
-        this.setNewTime(deltaTime*1000);
+        this.tickInterval.setNewTime(deltaTime*1000);
 
         this.setState({
             syncLineIndex: syncLineIndex,
@@ -89,7 +100,6 @@ class LyricsPromptComp extends React.Component {
         this.setState({isPlaying: true})
     }
 
-    // TODO: special characters (, . ? ! : ; ( ) )
     onkeydown = (event) => {
         if (this.state.currLineIndex < 0 || this.state.currLineIndex >= this.subtitles.length)
             return;
@@ -169,7 +179,7 @@ class LyricsPromptComp extends React.Component {
     }
 
     render() {
-        if (this.state.isPlaying && !this.tickInterval.isRunning())
+        if (this.state.isPlaying)
             this.tickInterval.start();
 
         const lineIndexToDisplay = (this.state.currLineIndex < 0) ? 0 : this.state.currLineIndex;
@@ -177,17 +187,6 @@ class LyricsPromptComp extends React.Component {
             lineIndexToDisplay,
             lineIndexToDisplay+this.linesToDisplay
         );
-
-        // check win condition
-        if (currLines.length === 0) {
-            return <GameSummary/> // TODO
-        }
-
-        // check lose condition
-        const NO_OF_LINES_FOR_LOSE = 1; // debug, TODO: in production set to 3.
-        if (this.state.syncLineIndex-this.state.currLineIndex >= NO_OF_LINES_FOR_LOSE) {
-            return <GameSummary isWin={false} noOfWords={5} noOfCorrectWords={5}/>
-        }
 
         const subtitles = currLines.map((subtitle, i) => {
             const text = subtitle['text'];
@@ -227,4 +226,4 @@ class LyricsPromptComp extends React.Component {
     }
 }
 
-export default LyricsPromptComp;
+export default connect()(LyricsPromptComp);
