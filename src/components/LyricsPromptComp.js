@@ -4,7 +4,7 @@ import FirstLine from './FirstLine';
 import { DynamicInterval } from "../utils/Interval";
 import InvisibleReactPlayer from "./InvisibleReactPlayer";
 import Indicator from "./Indicator";
-import { setIsWin } from "../utils/GameStateSlice";
+import { setAccuracy, setIsWin } from "../utils/GameStateSlice";
 import { connect } from "react-redux";
 
 class LyricsPromptComp extends React.Component {
@@ -14,7 +14,9 @@ class LyricsPromptComp extends React.Component {
         // this.gameStateSlice = useSelector(state => state.gameStateSlice);
         // this.gameStateDispatch = useDispatch();
 
-        this.noOfCorrectWords = 0;
+        this.noOfTypes = 0;
+        this.noOfCorrectTypes = 0;
+
         this.subtitles = this.props.subtitles;
         this.ytSongID = this.props.ytSongID;
 
@@ -74,15 +76,22 @@ class LyricsPromptComp extends React.Component {
             successfulTypes = [];
         }
 
+        const accuracy = Math.floor((this.noOfCorrectTypes/this.noOfTypes)*100);
         // check win condition
         if (currLineIndex >= this.subtitles.length) {
+            dispatch(setAccuracy(accuracy));
             dispatch(setIsWin(true));
+            this.tickInterval.tickInterval.stop();
+            return;
         }
 
         // check lose condition
         const NO_OF_LINES_FOR_LOSE = 1; // debug, TODO: in production set to 3.
         if (syncLineIndex-currLineIndex >= NO_OF_LINES_FOR_LOSE) {
+            dispatch(setAccuracy(accuracy));
             dispatch(setIsWin(false));
+            this.tickInterval.tickInterval.stop();
+            return;
         }
 
         const deltaTime = (this.timingList[syncLineIndex+1] - this.timingList[syncLineIndex]); // TODO: bounds check
@@ -111,11 +120,17 @@ class LyricsPromptComp extends React.Component {
         if (this.state.isPlaying && this.handleSpecialKeys(event.keyCode))
             return;
 
+        this.noOfTypes++;
+
         const currLine = this.subtitles[currLineIndex]['text'];
         const pressedChar = event.key.toLowerCase();
         const targetChar = currLine.charAt(currCharIndex).toLowerCase();
 
-        successfulTypes.push(pressedChar === targetChar);
+        const isCharTypedCorrectly = (pressedChar === targetChar);
+        if (isCharTypedCorrectly)
+            this.noOfCorrectTypes++;
+
+        successfulTypes.push(isCharTypedCorrectly);
         currCharIndex++;
 
         if (currCharIndex >= currLine.length && this.state.syncLineIndex > this.state.currLineIndex) {

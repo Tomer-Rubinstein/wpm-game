@@ -5,6 +5,7 @@ import LoadingComp from "../components/LoadingComp";
 import LyricsPromptComp from "../components/LyricsPromptComp";
 import { useLocation } from "react-router-dom";
 import { store } from "../utils/GameStore";
+import GameSummary from "./GameSummary";
 
 
 /*
@@ -23,6 +24,7 @@ class Game extends React.Component {
             videoTitle: null,
             errorMsg: null,
             isWin: null,
+            accuracyPercentage: 0,
         };
 
         this.ytSongID = props.ytSongID;
@@ -40,7 +42,8 @@ class Game extends React.Component {
 
     handleStoreChange = () => {
         const isWin = store.getState().gameState.isWin;
-        this.setState({ isWin: isWin });
+        const accuracyPercentage = store.getState().gameState.accuracy;
+        this.setState({ isWin: isWin, accuracy: accuracyPercentage });
         this.unsubscribe();
     }
 
@@ -57,7 +60,10 @@ class Game extends React.Component {
 
     render() {
         if (this.state.isWin != null)
-            return <h1>TODO end game screen</h1>
+            return <GameSummary
+                isWin={this.state.isWin}
+                accuracyPercentage={store.getState().gameState.accuracy}
+            />
 
         return (
             <div className="background">
@@ -74,7 +80,7 @@ class Game extends React.Component {
                         Press <code style={{backgroundColor: "rgba(128, 128, 128, 0.548)", borderRadius: 5, color: "white"}}>Esc</code> to pause
                     </p>
                 </div>
-                
+
                 <div className="game" style={{width: "50%"}}>
                     <ShowSubtitles
                         state={this.state}

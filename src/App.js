@@ -6,7 +6,6 @@ import { Provider } from 'react-redux';
 import { store } from './utils/GameStore';
 
 function App() {
-  
   return (
     <BrowserRouter>
       <Routes>

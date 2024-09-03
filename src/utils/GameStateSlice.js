@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    isWin: null
+    isWin: null,
+    accuracy: null
 };
 
 export const gameStateSlice = createSlice({
@@ -10,10 +11,13 @@ export const gameStateSlice = createSlice({
     reducers: {
         setIsWin: (state, action) => {
             state.isWin = action.payload;
+        },
+        setAccuracy: (state, action) => {
+            state.accuracy = action.payload;
         }
     }
 });
 
-export const { setIsWin } = gameStateSlice.actions;
+export const { setIsWin, setAccuracy } = gameStateSlice.actions;
 
 export default gameStateSlice.reducer;
