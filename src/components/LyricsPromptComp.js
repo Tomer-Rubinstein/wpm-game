@@ -76,7 +76,8 @@ class LyricsPromptComp extends React.Component {
             successfulTypes = [];
         }
 
-        const accuracy = Math.floor((this.noOfCorrectTypes/this.noOfTypes)*100);
+        const accuracy = (this.noOfTypes === 0) ? 0 : Math.floor((this.noOfCorrectTypes/this.noOfTypes)*100);
+
         // check win condition
         if (currLineIndex >= this.subtitles.length) {
             dispatch(setAccuracy(accuracy));
@@ -152,7 +153,6 @@ class LyricsPromptComp extends React.Component {
         var successfulTypes = this.state.successfulTypes;
         var isPlaying = this.state.isPlaying;
         var syncLineIndex = this.state.syncLineIndex;
-        const currLine = this.subtitles[currLineIndex]['text'];
 
         switch (keyCode) {
             // escape - pause game
@@ -165,19 +165,6 @@ class LyricsPromptComp extends React.Component {
             case 8:
                 successfulTypes.pop();
                 currCharIndex = (currCharIndex-1 < 0) ? 0 : currCharIndex-1;
-                break;
-
-            // space bar - can skip word if first letter attempt was made
-            case 32:
-                if (currCharIndex-1 >= 0 && currLine.charAt(currCharIndex-1) !== ' ') {
-                    while(currCharIndex < currLine.length) {
-                        successfulTypes.push(false);
-                        currCharIndex++;
-
-                        if (currLine.charAt(currCharIndex-1) === ' ')
-                            break;
-                    }
-                }
                 break;
 
             default: return false;
