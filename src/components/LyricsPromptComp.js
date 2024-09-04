@@ -170,12 +170,6 @@ class LyricsPromptComp extends React.Component {
         var syncLineIndex = this.state.syncLineIndex;
 
         switch (keyCode) {
-            // escape - pause game
-            case 27:
-                isPlaying = false;
-                console.log("[TODO] pause");
-                break;
-
             // backspace - delete last typed char
             case 8:
                 currCharIndex = (currCharIndex-1 < 0) ? 0 : currCharIndex-1;
@@ -184,7 +178,6 @@ class LyricsPromptComp extends React.Component {
                 this.noOfTypes--;
                 if (wasTypedCorrectly)
                     this.noOfCorrectTypes--;
-
                 break;
 
             default: return false;

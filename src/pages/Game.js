@@ -91,10 +91,6 @@ class Game extends React.Component {
                     </h3>
 
                     <div className="controls">
-                        <p style={{fontSize: 18, color: "rgba(255, 255, 255, 0.5)"}}>
-                            Press <code style={{backgroundColor: "rgba(128, 128, 128, 0.548)", borderRadius: 5, color: "white"}}>Esc</code> to pause
-                        </p>
-                        
                         <Box sx={{ width: 200 }}>
                             <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }} style={{ alignItems: "center", margin: 0 }}>
                                 <VolumeDown />
