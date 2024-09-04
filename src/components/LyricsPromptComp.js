@@ -44,13 +44,19 @@ class LyricsPromptComp extends React.Component {
     * returns the fixated timingList and the constant that was used for the fix 
     * the fix constant will be used to start the ReactPlayer accordingly */
     initTimingList = (subtitles, startTimeDelta) => {
+        const HEADSTART_FORE = 0.3;
         var fix = 0;
+
         const timingList = subtitles.map((subtitle, i) => {
             var startTime = subtitle['startTime'];
             if (i === 0)
                 fix = Math.max(0, startTime-startTimeDelta);
 
-            return startTime-fix;
+            const newStartTime = startTime-fix-HEADSTART_FORE;
+            if (newStartTime < 0)
+                return startTime;
+ 
+            return newStartTime;
         });
 
         return [timingList, fix];
@@ -172,8 +178,13 @@ class LyricsPromptComp extends React.Component {
 
             // backspace - delete last typed char
             case 8:
-                successfulTypes.pop();
                 currCharIndex = (currCharIndex-1 < 0) ? 0 : currCharIndex-1;
+                const wasTypedCorrectly = successfulTypes.pop();
+
+                this.noOfTypes--;
+                if (wasTypedCorrectly)
+                    this.noOfCorrectTypes--;
+
                 break;
 
             default: return false;

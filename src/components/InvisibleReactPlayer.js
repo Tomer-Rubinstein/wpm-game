@@ -3,8 +3,6 @@ import React from 'react';
 
 export default function InvisibleReactPlayer({timeToStart, isPlaying, ytSongID, volume}) {
     const playerRef = React.useRef();
-    
-    console.log(volume);
 
     const onReady = React.useCallback(() => {
         playerRef.current.seekTo(timeToStart, "seconds");

@@ -15,13 +15,6 @@ import VolumeDown from '@mui/icons-material/VolumeDown';
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import Box from '@mui/material/Box';
 
-/*
-TODO:
-- keyboard shortcuts
-- volume controls
-- restart button
-*/
-
 
 class Game extends React.Component {
     constructor(props) {
