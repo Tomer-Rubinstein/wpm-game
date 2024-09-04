@@ -16,3 +16,13 @@
 .game {
     margin-top: 3%;
 }
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.controls > * {
+    margin: 0;
+}

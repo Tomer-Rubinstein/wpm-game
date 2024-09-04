@@ -6,7 +6,14 @@ import LyricsPromptComp from "../components/LyricsPromptComp";
 import { useLocation } from "react-router-dom";
 import { store } from "../utils/GameStore";
 import GameSummary from "./GameSummary";
-
+import { IconButton } from '@mui/material';
+import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Stack from '@mui/material/Stack';
+import Slider from '@mui/material/Slider';
+import VolumeDown from '@mui/icons-material/VolumeDown';
+import VolumeUp from '@mui/icons-material/VolumeUp';
+import Box from '@mui/material/Box';
 
 /*
 TODO:
@@ -25,6 +32,7 @@ class Game extends React.Component {
             errorMsg: null,
             isWin: null,
             accuracyPercentage: 0,
+            volume: 30,
         };
 
         this.ytSongID = props.ytSongID;
@@ -58,12 +66,24 @@ class Game extends React.Component {
         });
     }
 
+    handleChange = (event, newVolume) => {
+        this.setState({volume: newVolume});
+    }
+
     render() {
         if (this.state.isWin != null)
             return <GameSummary
                 isWin={this.state.isWin}
                 accuracyPercentage={store.getState().gameState.accuracy}
             />
+
+        const theme = createTheme({
+            palette: {
+                primary: {
+                    main: "#FFFFFF",
+                },
+            }
+        });
 
         return (
             <div className="background">
@@ -76,15 +96,37 @@ class Game extends React.Component {
                             color: "wheat"
                         }}>"{this.state.videoTitle}"</p>
                     </h3>
-                    <p style={{fontSize: 18, color: "rgba(255, 255, 255, 0.5)"}}>
-                        Press <code style={{backgroundColor: "rgba(128, 128, 128, 0.548)", borderRadius: 5, color: "white"}}>Esc</code> to pause
-                    </p>
+
+                    <div className="controls">
+                        <p style={{fontSize: 18, color: "rgba(255, 255, 255, 0.5)"}}>
+                            Press <code style={{backgroundColor: "rgba(128, 128, 128, 0.548)", borderRadius: 5, color: "white"}}>Esc</code> to pause
+                        </p>
+                        
+                        <Box sx={{ width: 200 }}>
+                            <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }} style={{ alignItems: "center", margin: 0 }}>
+                                <VolumeDown />
+                                <ThemeProvider theme={theme}>
+                                <Slider aria-label="Volume" value={this.state.volume} onChange={this.handleChange}/>
+                                </ThemeProvider>
+                                <VolumeUp />
+                            </Stack>
+                        </Box>
+
+                        <ThemeProvider theme={theme}>
+                            <IconButton color="primary" onClick={() => {window.location.reload();}}>
+                                <ReplayRoundedIcon
+                                    fontSize="medium" 
+                                />
+                            </IconButton>
+                        </ThemeProvider>
+                    </div>
                 </div>
 
                 <div className="game" style={{width: "50%"}}>
                     <ShowSubtitles
                         state={this.state}
                         ytSongID={this.ytSongID}
+                        volume={this.state.volume/100}
                     />
                 </div>
             </div>
@@ -102,6 +144,7 @@ function ShowSubtitles({state, ytSongID}) {
     return <LyricsPromptComp
         subtitles={state.subtitles}
         ytSongID={ytSongID}
+        volume={state.volume/100}
     />
 }
 

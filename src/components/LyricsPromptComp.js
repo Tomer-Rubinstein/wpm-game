@@ -19,6 +19,7 @@ class LyricsPromptComp extends React.Component {
 
         this.subtitles = this.props.subtitles;
         this.ytSongID = this.props.ytSongID;
+        this.volume = this.props.volume;
 
         const startTimeDelta = 1; // debug, TODO: in production set to 5 
         [this.timingList, this.fixedStartTime] = this.initTimingList(this.subtitles, startTimeDelta);
@@ -230,6 +231,7 @@ class LyricsPromptComp extends React.Component {
                     timeToStart={this.fixedStartTime}
                     isPlaying={this.state.isPlaying}
                     ytSongID={this.ytSongID}
+                    volume={this.props.volume}
                 />
             </div>
         );
