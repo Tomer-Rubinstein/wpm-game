@@ -19,7 +19,7 @@ export default function parseSubtitle(text) {
     text = text.replaceAll(regex, "");
 
     // display only english chars, numbers and punctuation
-    regex = /[^a-z0-9 \n']/gi;
+    regex = /[^a-z0-9 \n]/gi;
     text = text.replaceAll(regex, "");
 
     text = text.trim();

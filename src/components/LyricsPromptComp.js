@@ -87,7 +87,7 @@ class LyricsPromptComp extends React.Component {
         }
 
         // check lose condition
-        const NO_OF_LINES_FOR_LOSE = 1; // debug, TODO: in production set to 3.
+        const NO_OF_LINES_FOR_LOSE = 3; // debug, TODO: in production set to 3.
         if (syncLineIndex-currLineIndex >= NO_OF_LINES_FOR_LOSE) {
             dispatch(setAccuracy(accuracy));
             dispatch(setIsWin(false));
@@ -121,12 +121,20 @@ class LyricsPromptComp extends React.Component {
         if (this.state.isPlaying && this.handleSpecialKeys(event.keyCode))
             return;
 
-        this.noOfTypes++;
-
         const currLine = this.subtitles[currLineIndex]['text'];
         const pressedChar = event.key.toLowerCase();
         const targetChar = currLine.charAt(currCharIndex).toLowerCase();
 
+        // only allow english letters to be entered (and allow spacebar)
+        const A_KEY = 65;
+        const Z_KEY = 90;
+        const SPACEBAR_KEY = 32;
+        const isPressedCharEnglish = (A_KEY <= event.keyCode && event.keyCode <= Z_KEY);
+        if (!isPressedCharEnglish && event.keyCode !== SPACEBAR_KEY)
+            return;
+
+        // for calculations of accuracy percentage (noOfCorrectTypes/noOfTypes)
+        this.noOfTypes++;
         const isCharTypedCorrectly = (pressedChar === targetChar);
         if (isCharTypedCorrectly)
             this.noOfCorrectTypes++;
