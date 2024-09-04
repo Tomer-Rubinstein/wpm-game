@@ -6,7 +6,7 @@ import LyricsPromptComp from "../components/LyricsPromptComp";
 import { useLocation } from "react-router-dom";
 import { store } from "../utils/GameStore";
 import GameSummary from "./GameSummary";
-import { IconButton } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
@@ -14,6 +14,7 @@ import Slider from '@mui/material/Slider';
 import VolumeDown from '@mui/icons-material/VolumeDown';
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import Box from '@mui/material/Box';
+import KeyboardBackspaceRoundedIcon from '@mui/icons-material/KeyboardBackspaceRounded';
 
 
 class Game extends React.Component {
@@ -91,22 +92,36 @@ class Game extends React.Component {
                     </h3>
 
                     <div className="controls">
+                        <ThemeProvider theme={theme}>
+                            <Tooltip title="Home">
+                                <IconButton color="primary" onClick={() => {window.location = "/"}}>
+                                    <KeyboardBackspaceRoundedIcon
+                                        fontSize="medium" 
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                        </ThemeProvider>
+                        
                         <Box sx={{ width: 200 }}>
                             <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }} style={{ alignItems: "center", margin: 0 }}>
                                 <VolumeDown />
                                 <ThemeProvider theme={theme}>
-                                <Slider aria-label="Volume" value={this.state.volume} onChange={this.handleChange}/>
+                                    <Tooltip title="Volume">
+                                        <Slider aria-label="Volume" value={this.state.volume} onChange={this.handleChange}/>
+                                    </Tooltip>
                                 </ThemeProvider>
                                 <VolumeUp />
                             </Stack>
                         </Box>
 
                         <ThemeProvider theme={theme}>
-                            <IconButton color="primary" onClick={() => {window.location.reload();}}>
-                                <ReplayRoundedIcon
-                                    fontSize="medium" 
-                                />
-                            </IconButton>
+                            <Tooltip title="Retry">
+                                <IconButton color="primary" onClick={() => {window.location.reload();}}>
+                                    <ReplayRoundedIcon
+                                        fontSize="medium" 
+                                    />
+                                </IconButton>
+                            </Tooltip>
                         </ThemeProvider>
                     </div>
                 </div>
