@@ -226,7 +226,7 @@ class LyricsPromptComp extends React.Component {
             if (i === this.state.syncLineIndex-this.state.currLineIndex)
                 return (
                     <div key={i} style={{display: "inline-block"}}>
-                        <Indicator syncLineIndex={this.state.syncLineIndex} currLineIndex={this.state.currLineIndex}/>
+                        <Indicator showIndicator={this.state.syncLineIndex >= 0} syncLineIndex={this.state.syncLineIndex} currLineIndex={this.state.currLineIndex}/>
                         <div style={{display: "inline-block"}}>{element}</div>
                     </div>
                 );
