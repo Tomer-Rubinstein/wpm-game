@@ -72,7 +72,10 @@ export default function Home () {
                 <Grid container justifyContent="center" spacing={20} paddingTop="1%">
                     {quickPlays.map((play, index) => (
                         <Grid key={index} item>
-                            <RecommendationCard songUrl={play['songUrl']} songTitle={play['songTitle']}/>
+                            <RecommendationCard
+                                songUrl={play['songUrl']}
+                                songTitle={play['songTitle']}
+                            />
                         </Grid>
                     ))}
                 </Grid>

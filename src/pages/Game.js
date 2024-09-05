@@ -71,6 +71,10 @@ class Game extends React.Component {
                 accuracyPercentage={store.getState().gameState.accuracy}
             />
 
+        const isFetchingSubtitles = (this.state.subtitles == null && this.state.errorMsg == null);
+        if (isFetchingSubtitles)
+            return <LoadingComp/>
+
         const theme = createTheme({
             palette: {
                 primary: {
@@ -139,12 +143,9 @@ class Game extends React.Component {
 }
 
 function ShowSubtitles({state, ytSongID}) {
-    const isFetchingSubtitles = (state.subtitles == null && state.errorMsg == null);
-    const isError = (state.errorMsg != null);
+    if (state.errorMsg != null)
+        return <p>{state.errorMsg}</p>
 
-    if (isFetchingSubtitles) return <LoadingComp/>
-    if (isError) return <p>{state.errorMsg}</p>
-    
     return <LyricsPromptComp
         subtitles={state.subtitles}
         ytSongID={ytSongID}
