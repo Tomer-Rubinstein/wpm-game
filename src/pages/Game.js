@@ -15,6 +15,7 @@ import VolumeDown from '@mui/icons-material/VolumeDown';
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import Box from '@mui/material/Box';
 import KeyboardBackspaceRoundedIcon from '@mui/icons-material/KeyboardBackspaceRounded';
+import SubtitlesErrorPage from "./SubtitlesErrorPage";
 
 
 class Game extends React.Component {
@@ -90,7 +91,7 @@ class Game extends React.Component {
             return <LoadingComp/>
 
         if (this.state.errorMsg != null)
-            return <p>{this.state.errorMsg}</p>
+            return <SubtitlesErrorPage errorMsg={this.state.errorMsg}/>
 
         const theme = createTheme({
             palette: {

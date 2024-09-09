@@ -1,0 +1,16 @@
+
+.parentErrorPage {
+    margin-top: 30vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.parentErrorPage > h1 {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.parentErrorPage > * {
+    margin: 0;
+}
