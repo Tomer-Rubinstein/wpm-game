@@ -50,6 +50,8 @@ class Game extends React.Component {
     }
 
     shortenVideoTitle = (title) => {
+        if (title == null) return null;
+
         const prefix = "...";
         const maxTitleLen = 30;
 
@@ -60,15 +62,15 @@ class Game extends React.Component {
     }
 
     getSubtitles = async () => {
-        const [videoTitle, subtitles] = await fetchSubtitles(this.ytSongID);
+        var [videoTitle, subtitles] = await fetchSubtitles(this.ytSongID);
         if (videoTitle == null || subtitles == null)
             this.setState({errorMsg: "Could not find subtitles 🙁"});
 
-        const shortenedVideoTitle = this.shortenVideoTitle(videoTitle);
+        videoTitle = this.shortenVideoTitle(videoTitle);
 
         this.setState({
             subtitles: subtitles,
-            videoTitle: shortenedVideoTitle,
+            videoTitle: videoTitle,
         });
     }
 
@@ -86,6 +88,9 @@ class Game extends React.Component {
         const isFetchingSubtitles = (this.state.subtitles == null && this.state.errorMsg == null);
         if (isFetchingSubtitles)
             return <LoadingComp/>
+
+        if (this.state.errorMsg != null)
+            return <p>{this.state.errorMsg}</p>
 
         const theme = createTheme({
             palette: {
@@ -155,9 +160,6 @@ class Game extends React.Component {
 }
 
 function ShowSubtitles({state, ytSongID}) {
-    if (state.errorMsg != null)
-        return <p>{state.errorMsg}</p>
-
     return <LyricsPromptComp
         subtitles={state.subtitles}
         ytSongID={ytSongID}

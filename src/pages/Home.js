@@ -34,7 +34,12 @@ export default function Home () {
 
     const playGameByUrl = (event) => {
         if (event.key === "Enter") {
-            const youtubeUrl = event.target.value;
+            var youtubeUrl = event.target.value;
+            const youtubeVidIdLen = 11;
+
+            if (youtubeUrl.length > youtubeVidIdLen)
+                youtubeUrl = youtubeUrl.substring(youtubeUrl.length-11);
+
             event.preventDefault();
             navigate(`/game?ytSongID=${youtubeUrl}`);
         }

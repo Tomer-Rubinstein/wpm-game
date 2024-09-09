@@ -11,9 +11,6 @@ class LyricsPromptComp extends React.Component {
     constructor(props) {
         super(props);
 
-        // this.gameStateSlice = useSelector(state => state.gameStateSlice);
-        // this.gameStateDispatch = useDispatch();
-
         this.noOfTypes = 0;
         this.noOfCorrectTypes = 0;
 
@@ -21,10 +18,12 @@ class LyricsPromptComp extends React.Component {
         this.ytSongID = this.props.ytSongID;
         this.volume = this.props.volume;
 
-        const startTimeDelta = 1; // debug, TODO: in production set to 5 
+        const startTimeDelta = 5;
         [this.timingList, this.fixedStartTime] = this.initTimingList(this.subtitles, startTimeDelta);
 
         this.linesToDisplay = 5;
+        this.noOfLinesForLose = 3;
+
         this.startedCounting = false;
         this.tickInterval = new DynamicInterval(this.gameTick, this.timingList[0]*1000);
 
@@ -94,8 +93,7 @@ class LyricsPromptComp extends React.Component {
         }
 
         // check lose condition
-        const NO_OF_LINES_FOR_LOSE = 3; // debug, TODO: in production set to 3.
-        if (syncLineIndex-currLineIndex >= NO_OF_LINES_FOR_LOSE) {
+        if (syncLineIndex-currLineIndex >= this.noOfLinesForLose) {
             dispatch(setAccuracy(accuracy));
             dispatch(setIsWin(false));
             this.tickInterval.tickInterval.stop();
