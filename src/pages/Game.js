@@ -49,14 +49,26 @@ class Game extends React.Component {
         this.unsubscribe();
     }
 
+    shortenVideoTitle = (title) => {
+        const prefix = "...";
+        const maxTitleLen = 30;
+
+        if (title.length > maxTitleLen)
+            title = title.substring(0, maxTitleLen) + prefix;
+        
+        return title;
+    }
+
     getSubtitles = async () => {
         const [videoTitle, subtitles] = await fetchSubtitles(this.ytSongID);
         if (videoTitle == null || subtitles == null)
             this.setState({errorMsg: "Could not find subtitles 🙁"});
 
+        const shortenedVideoTitle = this.shortenVideoTitle(videoTitle);
+
         this.setState({
             subtitles: subtitles,
-            videoTitle: videoTitle,
+            videoTitle: shortenedVideoTitle,
         });
     }
 
@@ -86,13 +98,13 @@ class Game extends React.Component {
         return (
             <div className="background">
                 <div className="header">
-                    <h3 style={{fontSize: 26}}>Now Playing...
+                    <h3 style={{fontSize: 26}}>Now Playing
                         <p style={{
                             display: "inline",
                             fontStyle: "italic",
                             fontSize: 32,
                             color: "wheat"
-                        }}>"{this.state.videoTitle}"</p>
+                        }}> "{this.state.videoTitle}"</p>
                     </h3>
 
                     <div className="controls">
