@@ -1,6 +1,5 @@
 import parseSubtitle from "./SubtitleParser";
 
-
 async function getSubtitlesUrl(ytVideoID) {
     const apiKey = process.env.REACT_APP_YT_API_KEY;
     const apiUrl = `/player?key=${apiKey}&prettyPrint=false`; // assumes package.json proxy points to "youtubei/v1" API
